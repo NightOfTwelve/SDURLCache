@@ -57,7 +57,7 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
 
 @implementation SDURLCache
 
-@synthesize diskCachePath, minCacheInterval, ioQueue, periodicMaintenanceOperation, ignoreMemoryOnlyStoragePolicy;
+@synthesize diskCachePath, minCacheInterval, ioQueue, periodicMaintenanceOperation, ignoreMemoryOnlyStoragePolicy, breakURLCacheCompatibility;
 @dynamic diskCacheInfo;
 
 #pragma mark SDURLCache (tools)
@@ -412,6 +412,7 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
         ioQueue.maxConcurrentOperationCount = 1; // used to streamline operations in a separate thread
 
         self.ignoreMemoryOnlyStoragePolicy = YES;
+        self.breakURLCacheCompatibility = NO;
 	}
 
     return self;
@@ -425,8 +426,9 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
     {
         // When cache is ignored for read, it's a good idea not to store the result as well as this option
         // have big chance to be used every times in the future for the same request.
-        // NOTE: This is a change regarding default URLCache behavior
-        return;
+        // NOTE: This is a change regarding default URLCache behavior and therefore breaks things and should not be done
+        if (breakURLCacheCompatibility)
+            return;
     }
 
     [super storeCachedResponse:cachedResponse forRequest:request];

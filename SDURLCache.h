@@ -13,7 +13,7 @@
     @private
     NSString *diskCachePath;
     NSMutableDictionary *diskCacheInfo;
-    BOOL diskCacheInfoDirty, ignoreMemoryOnlyStoragePolicy;
+    BOOL diskCacheInfoDirty, ignoreMemoryOnlyStoragePolicy, breakURLCacheCompatibility;
     NSUInteger diskCacheUsage;
     NSTimeInterval minCacheInterval;
     NSOperationQueue *ioQueue;
@@ -38,6 +38,16 @@
  * The default value is YES
  */
 @property (nonatomic, assign) BOOL ignoreMemoryOnlyStoragePolicy;
+
+/*
+ * Do not locally cache responses to requests that bypassed the local cache. As requests that bypass the
+ * local cache are normally attempts to update the local cache, this is not the normal URLCache behavior
+ * and should not be activated unless requests are knowingly being made with incorrect cache parameters.
+ *
+ * This is only provided as old versions of SDURLCache had this behavior, and maybe someone relies on it.
+ * The default value is NO
+ */
+@property (nonatomic, assign) BOOL breakURLCacheCompatibility;
 
 /*
  * Returns a default cache director path to be used at cache initialization. The generated path directory
