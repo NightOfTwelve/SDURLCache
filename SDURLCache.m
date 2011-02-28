@@ -62,6 +62,18 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
 
 #pragma mark SDURLCache (tools)
 
++ (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request
+{
+    NSString *string = request.URL.absoluteString;
+    NSRange hash = [string rangeOfString:@"#"];
+    if (hash.location == NSNotFound)
+        return request;
+
+    NSMutableURLRequest *copy = request.mutableCopy;
+    copy.URL = [NSURL URLWithString:[string substringToIndex:hash.location]];
+    return copy;
+}
+
 + (NSString *)cacheKeyForURL:(NSURL *)url
 {
     const char *str = [url.absoluteString UTF8String];
@@ -420,6 +432,8 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
 
 - (void)storeCachedResponse:(NSCachedURLResponse *)cachedResponse forRequest:(NSURLRequest *)request
 {
+    request = [SDURLCache canonicalRequestForRequest:request];
+
     if (request.cachePolicy == NSURLRequestReloadIgnoringLocalCacheData
         || request.cachePolicy == NSURLRequestReloadIgnoringLocalAndRemoteCacheData
         || request.cachePolicy == NSURLRequestReloadIgnoringCacheData)
@@ -462,6 +476,8 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
 
 - (NSCachedURLResponse *)cachedResponseForRequest:(NSURLRequest *)request
 {
+    request = [SDURLCache canonicalRequestForRequest:request];
+
     NSCachedURLResponse *memoryResponse = [super cachedResponseForRequest:request];
     if (memoryResponse)
     {
@@ -502,6 +518,8 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
 
 - (void)removeCachedResponseForRequest:(NSURLRequest *)request
 {
+    request = [SDURLCache canonicalRequestForRequest:request];
+
     [super removeCachedResponseForRequest:request];
     [self removeCachedResponseForCachedKeys:[NSArray arrayWithObject:[SDURLCache cacheKeyForURL:request.URL]]];
     [self saveCacheInfo];
@@ -521,6 +539,8 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
 - (BOOL)isCached:(NSURL *)url
 {
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    request = [SDURLCache canonicalRequestForRequest:request];
+
     if ([super cachedResponseForRequest:request])
     {
         return YES;
