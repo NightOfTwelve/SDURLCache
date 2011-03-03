@@ -410,6 +410,9 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
     return [[paths objectAtIndex:0] stringByAppendingPathComponent:@"SDURLCache"];
 }
 
+- (void) logEvent:(NSString *)event forRequest:(NSURLRequest *)request {
+}
+
 #pragma mark NSURLCache
 
 - (id)initWithMemoryCapacity:(NSUInteger)memoryCapacity diskCapacity:(NSUInteger)diskCapacity diskPath:(NSString *)path
@@ -461,10 +464,12 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
             if (!expirationDate || [expirationDate timeIntervalSinceNow] - minCacheInterval <= 0)
             {
                 // This response is not cacheable, headers said
+                [self logEvent:@"no-cache" forRequest:request];
                 return;
             }
         }
 
+        [self logEvent:@"store" forRequest:request];
         [ioQueue addOperation:[[[NSInvocationOperation alloc] initWithTarget:self
                                                                     selector:@selector(storeToDisk:)
                                                                       object:[NSDictionary dictionaryWithObjectsAndKeys:
@@ -472,6 +477,8 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
                                                                               request, @"request",
                                                                               nil]] autorelease]];
     }
+    else
+        [self logEvent:@"invalid" forRequest:request];
 }
 
 - (NSCachedURLResponse *)cachedResponseForRequest:(NSURLRequest *)request
@@ -481,6 +488,7 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
     NSCachedURLResponse *memoryResponse = [super cachedResponseForRequest:request];
     if (memoryResponse)
     {
+        [self logEvent:@"memory" forRequest:request];
         return memoryResponse;
     }
 
@@ -503,11 +511,13 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
 
                 // OPTI: Store the response to memory cache for potential future requests
                 [super storeCachedResponse:diskResponse forRequest:request];
+                [self logEvent:@"disk" forRequest:request];
                 return diskResponse;
             }
         }
     }
 
+    [self logEvent:@"miss" forRequest:request];
     return nil;
 }
 

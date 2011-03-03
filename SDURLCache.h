@@ -65,4 +65,9 @@
  */
 - (BOOL)clearCache;
 
+/*
+ * Override in subclasses to log events related to caching.
+ */
+- (void) logEvent:(NSString *)event forRequest:(NSURLRequest *)request;
+
 @end
