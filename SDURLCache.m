@@ -250,6 +250,8 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
                 }
                 diskCacheInfoDirty = NO;
 
+                diskCacheUsage = [[diskCacheInfo objectForKey:kSDURLCacheInfoDiskUsageKey] unsignedIntValue];
+
                 periodicMaintenanceTimer = [[NSTimer scheduledTimerWithTimeInterval:5
                                                                              target:self
                                                                            selector:@selector(periodicMaintenance)
