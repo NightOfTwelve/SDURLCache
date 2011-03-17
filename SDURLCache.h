@@ -61,11 +61,6 @@
 - (BOOL)isCached:(NSURL *)url;
 
 /*
- * Removes the cache contents.
- */
-- (BOOL)clearCache;
-
-/*
  * Override in subclasses to log events related to caching.
  */
 - (void) logEvent:(NSString *)event forRequest:(NSURLRequest *)request;
