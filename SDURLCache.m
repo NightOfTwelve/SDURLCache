@@ -166,7 +166,7 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
             {
                 if (maxAge > 0)
                 {
-                    return [NSDate dateWithTimeIntervalSinceNow:maxAge];
+                    return [[[NSDate alloc] initWithTimeInterval:maxAge sinceDate:now] autorelease];
                 }
                 else
                 {
