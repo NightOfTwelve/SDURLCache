@@ -506,7 +506,21 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
         NSMutableDictionary *accesses = [self.diskCacheInfo objectForKey:kSDURLCacheInfoAccessesKey];
         if ([accesses objectForKey:cacheKey]) // OPTI: Check for cache-hit in a in-memory dictionnary before to hit the FS
         {
-            NSCachedURLResponse *diskResponse = [NSKeyedUnarchiver unarchiveObjectWithFile:[diskCachePath stringByAppendingPathComponent:cacheKey]];
+            NSString *path = [diskCachePath stringByAppendingPathComponent:cacheKey];
+            NSCachedURLResponse *diskResponse;
+
+            // SRK: archiving objects that are very very large sometimes results in invalid plists
+            // http://stackoverflow.com/questions/2026720/archiving-unarchiving-results-in-initforreadingwithdata-incomprehensible-archi
+
+            @try {
+                diskResponse = [NSKeyedUnarchiver unarchiveObjectWithFile:path];
+            } @catch (NSException *e) { // NSInvalidArgumentException
+                diskResponse = nil;
+
+                NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
+                [fileManager removeItemAtPath:path error:NULL];
+            }
+
             if (diskResponse)
             {
                 // OPTI: Log the entry last access time for LRU cache eviction algorithm but don't save the dictionary
