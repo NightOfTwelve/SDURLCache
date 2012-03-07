@@ -73,7 +73,7 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
     if (hash.location == NSNotFound)
         return request;
 
-    NSMutableURLRequest *copy = [request.mutableCopy autorelease];
+    NSMutableURLRequest *copy = [[request mutableCopy] autorelease];
     copy.URL = [NSURL URLWithString:[string substringToIndex:hash.location]];
     return copy;
 }
@@ -551,9 +551,12 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
 
                 // SRK: Work around an interesting retainCount bug in CFNetwork on iOS << 3.2.
                 if (kCFCoreFoundationVersionNumber < kCFCoreFoundationVersionNumber_iPhoneOS_3_2)
+                {
                     diskResponse = [super cachedResponseForRequest:request];
+                }
 
-                if (diskResponse) {
+                if (diskResponse)
+                {
                     [self logEvent:@"disk" forRequest:request];
                     return diskResponse;
                 }
@@ -567,7 +570,10 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
 
 - (NSUInteger)currentDiskUsage
 {
-    (void) self.diskCacheInfo;
+    if (!diskCacheInfo)
+    {
+        [self diskCacheInfo];
+    }
     return diskCacheUsage;
 }
 
