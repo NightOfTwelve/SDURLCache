@@ -435,7 +435,7 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
 
 - (id)initWithMemoryCapacity:(NSUInteger)memoryCapacity diskCapacity:(NSUInteger)diskCapacity diskPath:(NSString *)path
 {
-    if ((self = [super initWithMemoryCapacity:memoryCapacity diskCapacity:diskCapacity diskPath:path]))
+    if ((self = [super initWithMemoryCapacity:memoryCapacity diskCapacity:diskCapacity diskPath:nil]))
     {
         self.minCacheInterval = kSDURLCacheInfoDefaultMinCacheInterval;
         self.diskCachePath = path;
