@@ -65,4 +65,7 @@
  */
 - (void) logEvent:(NSString *)event forRequest:(NSURLRequest *)request;
 
+- (NSString *) diskCachePath;
+- (void)createDiskCachePath;
+
 @end

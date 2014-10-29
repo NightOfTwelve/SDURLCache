@@ -272,6 +272,10 @@ static NSDateFormatter* CreateDateFormatter(NSString *format)
     return diskCacheInfo;
 }
 
+- (NSString *) diskCachePath {
+    return diskCachePath;
+}
+
 - (void)createDiskCachePath
 {
     NSFileManager *fileManager = [[NSFileManager alloc] init];
